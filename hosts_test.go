@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -18,54 +19,28 @@ func TestApp_Handle(t *testing.T) {
 		{
 			name:      "Base Case",
 			havingCmd: Cmd{Resume: false},
-			having: `# LOCALHOST
-127.0.0.1       localhost
-
-#BLOCKME
-#0.0.0.0 www.facebook.com
-#/BLOCKME
-
-127.0.0.1       localhost
-`,
-			expects: `# LOCALHOST
-127.0.0.1       localhost
-
-#BLOCKME
-0.0.0.0 www.facebook.com
-#/BLOCKME
-
-127.0.0.1       localhost
-`,
+			having:    testdata(t, "basecase.input.txt"),
+			expects:   testdata(t, "basecase.output.txt"),
 		},
 		{
 			name:      "Empty line should not be commented",
 			havingCmd: Cmd{Pause: false},
-			having: `# LOCALHOST
-#BLOCKME
-#0.0.0.0 www.facebook.com
-
-#/BLOCKME
-`,
-			expects: `# LOCALHOST
-#BLOCKME
-0.0.0.0 www.facebook.com
-
-#/BLOCKME
-`,
+			having:    testdata(t, "emptyline.input.txt"),
+			expects:   testdata(t, "emptyline.output.txt"),
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			file, err := ioutil.TempFile("/tmp", "hoststest")
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer os.Remove(file.Name())
 
 			status, err := ioutil.TempFile("/tmp", "status")
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer os.Remove(status.Name())
 
 			err = ioutil.WriteFile(file.Name(), []byte(test.having), 0666)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			app := NewApp(
 				NewHostFile(file.Name()),
@@ -77,8 +52,18 @@ func TestApp_Handle(t *testing.T) {
 			require.NoError(t, err)
 
 			data, err := ioutil.ReadFile(file.Name())
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, test.expects, string(data))
 		})
 	}
+}
+
+func testdata(t *testing.T, name string) string {
+	f, err := os.Open(filepath.Join("testdata", name))
+	require.NoError(t, err)
+
+	content, err := ioutil.ReadAll(f)
+	require.NoError(t, err)
+
+	return string(content)
 }

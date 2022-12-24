@@ -1,0 +1,8 @@
+# LOCALHOST
+127.0.0.1       localhost
+
+#BLOCKME
+0.0.0.0 www.facebook.com
+#/BLOCKME
+
+127.0.0.1       localhost
