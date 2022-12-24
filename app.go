@@ -41,7 +41,6 @@ func (app *App) Handle(cmd Cmd) error {
 	}
 
 	if isPaused, err := app.appStatusManager.InStatus(StatusPaused); err != nil {
-		fmt.Println("we return an error?")
 		return err
 	} else {
 		if isPaused {
