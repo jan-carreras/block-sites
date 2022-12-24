@@ -19,8 +19,3 @@ func (h *hostFile) Read() ([]byte, error) {
 func (h *hostFile) Write(data []byte) error {
 	return os.WriteFile(h.hostPath, data, 0644)
 }
-
-type Cmd struct {
-	Pause  bool
-	Resume bool
-}

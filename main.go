@@ -20,13 +20,10 @@ func main() {
 	}
 }
 
-func getCmd() Cmd {
-	var pause = flag.Bool("pause", false, "pause the execution for 1 hour")
-	var resume = flag.Bool("resume", false, "resume the execution of the script")
+func getCmd() (cmd Cmd) {
+	flag.BoolVar(&cmd.Pause, "pause", false, "pause the execution for 1 hour")
+	flag.BoolVar(&cmd.Resume, "resume", false, "resume the execution of the script")
 	flag.Parse()
 
-	return Cmd{
-		Pause:  *pause,
-		Resume: *resume,
-	}
+	return cmd
 }

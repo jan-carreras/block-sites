@@ -26,6 +26,11 @@ func NewApp(
 	}
 }
 
+type Cmd struct {
+	Pause  bool
+	Resume bool
+}
+
 func (app *App) Handle(cmd Cmd) error {
 	if cmd.Pause {
 		err := app.appStatusManager.Pause(time.Hour)
