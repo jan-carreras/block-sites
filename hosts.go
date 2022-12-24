@@ -108,7 +108,7 @@ func (app *App) Handle(cmd Cmd) error {
 		}
 	}
 
-	if isPaused, err := app.appStatusManager.InStatus(STATUS_PAUSED); err != nil {
+	if isPaused, err := app.appStatusManager.InStatus(StatusPaused); err != nil {
 		fmt.Println("we return an error?")
 		return err
 	} else {
@@ -136,8 +136,8 @@ func (app *App) Handle(cmd Cmd) error {
 }
 
 const (
-	STATUS_RUNNING byte = 1
-	STATUS_PAUSED       = 2
+	StatusRunning byte = 1
+	StatusPaused       = 2
 )
 
 type appStatus struct {
@@ -168,9 +168,9 @@ func (f *FileStatusManager) currentStatus() (byte, error) {
 		return 0, err
 	}
 
-	currentStatus := STATUS_RUNNING
+	currentStatus := StatusRunning
 	if status.PauseUntil.After(time.Now()) {
-		currentStatus = STATUS_PAUSED
+		currentStatus = StatusPaused
 	}
 	return currentStatus, nil
 }
