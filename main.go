@@ -12,7 +12,7 @@ import (
 func main() {
 	app := NewApp(
 		"/etc/hosts",
-		NewFileStatusManager("/tmp/hostsstatus"),
+		NewStorage("/tmp/hostsstatus"),
 	)
 
 	if err := app.Handle(getCmd()); err != nil {

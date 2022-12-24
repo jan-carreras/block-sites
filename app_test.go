@@ -44,7 +44,7 @@ func TestApp_Handle(t *testing.T) {
 
 			app := NewApp(
 				file.Name(),
-				NewFileStatusManager(status.Name()),
+				NewStorage(status.Name()),
 			)
 
 			err = app.Handle(test.havingCmd)

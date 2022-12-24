@@ -1,29 +1,24 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"time"
 )
 
-type AppStatusManager interface {
-	InStatus(byte) (bool, error)
-	Pause(duration time.Duration) error
-	Resume() error
-}
-
 type App struct {
-	hostFilePath     string
-	appStatusManager AppStatusManager
+	hostFilePath string
+	storage      *Storage
 }
 
 func NewApp(
 	hostFilePath string,
-	appStatusManager AppStatusManager,
+	storage *Storage,
 ) *App {
 	return &App{
-		hostFilePath:     hostFilePath,
-		appStatusManager: appStatusManager,
+		hostFilePath: hostFilePath,
+		storage:      storage,
 	}
 }
 
@@ -34,19 +29,19 @@ type Cmd struct {
 
 func (app *App) Handle(cmd Cmd) error {
 	if cmd.Pause {
-		err := app.appStatusManager.Pause(time.Hour)
+		err := app.storage.Pause(time.Hour)
 		if err != nil {
 			return err
 		}
 	}
 
 	if cmd.Resume {
-		if err := app.appStatusManager.Resume(); err != nil {
+		if err := app.storage.Resume(); err != nil {
 			return err
 		}
 	}
 
-	if isPaused, err := app.appStatusManager.InStatus(StatusPaused); err != nil {
+	if isPaused, err := app.storage.IsStatus(StatusPaused); err != nil {
 		return err
 	} else if isPaused {
 		fmt.Println("Application in paused state. Doing nothing")
@@ -58,7 +53,7 @@ func (app *App) Handle(cmd Cmd) error {
 		return err
 	}
 
-	content, err = Block(content)
+	content, err = block(content)
 	if err != nil {
 		return err
 	}
@@ -68,4 +63,35 @@ func (app *App) Handle(cmd Cmd) error {
 	}
 
 	return nil
+}
+
+func block(data []byte) ([]byte, error) {
+	lines := bytes.Split(data, []byte("\n"))
+
+	block := false
+
+	for index, line := range lines {
+		if bytes.Equal(line, []byte("#BLOCKME")) {
+			block = true
+			continue
+		}
+		if bytes.Equal(line, []byte("#/BLOCKME")) {
+			block = false
+			continue
+		}
+		if !block { // We don't want to block, ignoring
+			continue
+		}
+
+		if len(line) == 0 { // Empty line, ignoring
+			continue
+		}
+
+		if line[0] != byte('#') { // Already blocked, ignoring
+			continue
+		}
+
+		lines[index] = line[1:]
+	}
+	return bytes.Join(lines, []byte("\n")), nil
 }
