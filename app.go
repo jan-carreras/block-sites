@@ -42,11 +42,9 @@ func (app *App) Handle(cmd Cmd) error {
 
 	if isPaused, err := app.appStatusManager.InStatus(StatusPaused); err != nil {
 		return err
-	} else {
-		if isPaused {
-			fmt.Println("Application in paused state. Doing nothing")
-			return nil // Do nothing
-		}
+	} else if isPaused {
+		fmt.Println("Application in paused state. Doing nothing")
+		return nil // Do nothing
 	}
 
 	content, err := app.hostFile.Read()
@@ -62,5 +60,6 @@ func (app *App) Handle(cmd Cmd) error {
 	if err := app.hostFile.Write(content); err != nil {
 		return err
 	}
+
 	return nil
 }
