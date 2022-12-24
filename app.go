@@ -13,12 +13,17 @@ type AppStatusManager interface {
 
 type App struct {
 	hostFile         hostFile
-	focusBlocker     focusBlocker
 	appStatusManager AppStatusManager
 }
 
-func NewApp(hostFile hostFile, focusBlocker focusBlocker, appStatusManager AppStatusManager) *App {
-	return &App{hostFile: hostFile, focusBlocker: focusBlocker, appStatusManager: appStatusManager}
+func NewApp(
+	hostFile hostFile,
+	appStatusManager AppStatusManager,
+) *App {
+	return &App{
+		hostFile:         hostFile,
+		appStatusManager: appStatusManager,
+	}
 }
 
 func (app *App) Handle(cmd Cmd) error {
@@ -50,8 +55,7 @@ func (app *App) Handle(cmd Cmd) error {
 		return err
 	}
 
-	fb := NewFocusBlocker()
-	content, err = fb.Block(content)
+	content, err = Block(content)
 	if err != nil {
 		return err
 	}

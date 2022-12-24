@@ -2,13 +2,7 @@ package main
 
 import "bytes"
 
-type focusBlocker struct{}
-
-func NewFocusBlocker() focusBlocker {
-	return focusBlocker{}
-}
-
-func (f *focusBlocker) Block(data []byte) ([]byte, error) {
+func Block(data []byte) ([]byte, error) {
 	lines := bytes.Split(data, []byte("\n"))
 
 	block := false

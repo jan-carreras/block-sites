@@ -12,7 +12,6 @@ import (
 func main() {
 	app := NewApp(
 		NewHostFile("/etc/hosts"),
-		NewFocusBlocker(),
 		NewFileStatusManager("/tmp/hostsstatus"),
 	)
 

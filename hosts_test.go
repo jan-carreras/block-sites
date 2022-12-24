@@ -44,7 +44,6 @@ func TestApp_Handle(t *testing.T) {
 
 			app := NewApp(
 				NewHostFile(file.Name()),
-				NewFocusBlocker(),
 				NewFileStatusManager(status.Name()),
 			)
 
