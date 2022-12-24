@@ -109,6 +109,7 @@ func (app *App) Handle(cmd Cmd) error {
 	}
 
 	if isPaused, err := app.appStatusManager.InStatus(STATUS_PAUSED); err != nil {
+		fmt.Println("we return an error?")
 		return err
 	} else {
 		if isPaused {
@@ -175,8 +176,8 @@ func (f *FileStatusManager) currentStatus() (byte, error) {
 }
 
 func (f *FileStatusManager) read() (appStatus, error) {
-	_, err := os.Stat(f.path)
-	if os.IsNotExist(err) {
+	fd, err := os.Stat(f.path)
+	if os.IsNotExist(err) || fd.Size() == 0 {
 		return appStatus{}, nil
 	}
 
