@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/cloudflare/cfssl/log"
-	"hosts/hosts"
 )
 
 // Be able to --pause (for 1h) and --resume the script functions
@@ -11,10 +10,10 @@ import (
 // "Resume" with return the script into Running state
 
 func main() {
-	app := hosts.NewApp(
-		hosts.NewHostFile("/etc/hosts"),
-		hosts.NewFocusBlocker(),
-		hosts.NewFileStatusManager("/tmp/hostsstatus"),
+	app := NewApp(
+		NewHostFile("/etc/hosts"),
+		NewFocusBlocker(),
+		NewFileStatusManager("/tmp/hostsstatus"),
 	)
 
 	if err := app.Handle(getCmd()); err != nil {
@@ -22,12 +21,12 @@ func main() {
 	}
 }
 
-func getCmd() hosts.Cmd {
+func getCmd() Cmd {
 	var pause = flag.Bool("pause", false, "pause the execution for 1 hour")
 	var resume = flag.Bool("resume", false, "resume the execution of the script")
 	flag.Parse()
 
-	return hosts.Cmd{
+	return Cmd{
 		Pause:  *pause,
 		Resume: *resume,
 	}

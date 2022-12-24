@@ -1,4 +1,4 @@
-package hosts
+package main
 
 import (
 	"bytes"
