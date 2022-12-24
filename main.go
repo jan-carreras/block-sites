@@ -11,7 +11,7 @@ import (
 
 func main() {
 	app := NewApp(
-		NewHostFile("/etc/hosts"),
+		"/etc/hosts",
 		NewFileStatusManager("/tmp/hostsstatus"),
 	)
 

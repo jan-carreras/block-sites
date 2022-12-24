@@ -43,7 +43,7 @@ func TestApp_Handle(t *testing.T) {
 			require.NoError(t, err)
 
 			app := NewApp(
-				NewHostFile(file.Name()),
+				file.Name(),
 				NewFileStatusManager(status.Name()),
 			)
 

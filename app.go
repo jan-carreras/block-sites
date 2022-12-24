@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -12,16 +13,16 @@ type AppStatusManager interface {
 }
 
 type App struct {
-	hostFile         hostFile
+	hostFilePath     string
 	appStatusManager AppStatusManager
 }
 
 func NewApp(
-	hostFile hostFile,
+	hostFilePath string,
 	appStatusManager AppStatusManager,
 ) *App {
 	return &App{
-		hostFile:         hostFile,
+		hostFilePath:     hostFilePath,
 		appStatusManager: appStatusManager,
 	}
 }
@@ -52,7 +53,7 @@ func (app *App) Handle(cmd Cmd) error {
 		return nil // Do nothing
 	}
 
-	content, err := app.hostFile.Read()
+	content, err := os.ReadFile(app.hostFilePath)
 	if err != nil {
 		return err
 	}
@@ -62,7 +63,7 @@ func (app *App) Handle(cmd Cmd) error {
 		return err
 	}
 
-	if err := app.hostFile.Write(content); err != nil {
+	if err := os.WriteFile(app.hostFilePath, content, 0644); err != nil {
 		return err
 	}
 
