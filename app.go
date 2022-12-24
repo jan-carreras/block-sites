@@ -1,0 +1,63 @@
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+type AppStatusManager interface {
+	InStatus(byte) (bool, error)
+	Pause(duration time.Duration) error
+	Resume() error
+}
+
+type App struct {
+	hostFile         hostFile
+	focusBlocker     focusBlocker
+	appStatusManager AppStatusManager
+}
+
+func NewApp(hostFile hostFile, focusBlocker focusBlocker, appStatusManager AppStatusManager) *App {
+	return &App{hostFile: hostFile, focusBlocker: focusBlocker, appStatusManager: appStatusManager}
+}
+
+func (app *App) Handle(cmd Cmd) error {
+	if cmd.Pause {
+		err := app.appStatusManager.Pause(time.Hour)
+		if err != nil {
+			return err
+		}
+	}
+
+	if cmd.Resume {
+		if err := app.appStatusManager.Resume(); err != nil {
+			return err
+		}
+	}
+
+	if isPaused, err := app.appStatusManager.InStatus(StatusPaused); err != nil {
+		fmt.Println("we return an error?")
+		return err
+	} else {
+		if isPaused {
+			fmt.Println("Application in paused state. Doing nothing")
+			return nil // Do nothing
+		}
+	}
+
+	content, err := app.hostFile.Read()
+	if err != nil {
+		return err
+	}
+
+	fb := NewFocusBlocker()
+	content, err = fb.Block(content)
+	if err != nil {
+		return err
+	}
+
+	if err := app.hostFile.Write(content); err != nil {
+		return err
+	}
+	return nil
+}
