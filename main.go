@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/cloudflare/cfssl/log"
+	"log"
 )
 
 // Be able to --pause (for 1h) and --resume the script functions
@@ -16,7 +16,7 @@ func main() {
 	)
 
 	if err := app.Handle(getCmd()); err != nil {
-		log.Errorf("Error! %v\n", err)
+		log.Fatalf("Error! %v\n", err)
 	}
 }
 

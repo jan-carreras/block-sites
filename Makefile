@@ -7,6 +7,9 @@ help: ## This help
 test: ## Pass all the tests
 	go test ./...
 
+fmt:
+	go fmt ./...
+
 build: test ## Build the binary
 	go build -o bin/hosts
 
