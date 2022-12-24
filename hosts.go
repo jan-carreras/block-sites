@@ -16,21 +16,12 @@ type AppStatusManager interface {
 	Resume() error
 }
 
-type HostReadWriter interface {
-	Read() ([]byte, error)
-	Write([]byte) error
-}
-
-type HostBlocker interface {
-	Block([]byte) ([]byte, error)
-}
-
 type hostFile struct {
 	hostPath string
 }
 
-func NewHostFile(hostPath string) HostReadWriter {
-	return &hostFile{hostPath: hostPath}
+func NewHostFile(hostPath string) hostFile {
+	return hostFile{hostPath: hostPath}
 }
 
 func (h *hostFile) Read() ([]byte, error) {
@@ -44,8 +35,8 @@ func (h *hostFile) Write(data []byte) error {
 type focusBlocker struct {
 }
 
-func NewFocusBlocker() HostBlocker {
-	return &focusBlocker{}
+func NewFocusBlocker() focusBlocker {
+	return focusBlocker{}
 }
 
 func (f *focusBlocker) Block(data []byte) ([]byte, error) {
@@ -85,13 +76,13 @@ type Cmd struct {
 }
 
 type App struct {
-	readWriter       HostReadWriter
-	hostBlocker      HostBlocker
+	hostFile         hostFile
+	focusBlocker     focusBlocker
 	appStatusManager AppStatusManager
 }
 
-func NewApp(readWriter HostReadWriter, hostBlocker HostBlocker, appStatusManager AppStatusManager) *App {
-	return &App{readWriter: readWriter, hostBlocker: hostBlocker, appStatusManager: appStatusManager}
+func NewApp(hostFile hostFile, focusBlocker focusBlocker, appStatusManager AppStatusManager) *App {
+	return &App{hostFile: hostFile, focusBlocker: focusBlocker, appStatusManager: appStatusManager}
 }
 
 func (app *App) Handle(cmd Cmd) error {
@@ -118,7 +109,7 @@ func (app *App) Handle(cmd Cmd) error {
 		}
 	}
 
-	content, err := app.readWriter.Read()
+	content, err := app.hostFile.Read()
 	if err != nil {
 		return err
 	}
@@ -129,7 +120,7 @@ func (app *App) Handle(cmd Cmd) error {
 		return err
 	}
 
-	if err := app.readWriter.Write(content); err != nil {
+	if err := app.hostFile.Write(content); err != nil {
 		return err
 	}
 	return nil
