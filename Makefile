@@ -1,7 +1,12 @@
+#!/usr/bin/env make
 
+.PHONY: help
+help: ## This help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-build:
+build: ## Build the binary
 	go build -o bin/hosts
 
-install: build
+.PHONY: help
+install: build ## Install the binary in the system
 	cp bin/hosts ~/.bin/hosts
