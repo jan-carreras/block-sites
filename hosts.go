@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"os"
 )
 
 type hostFile struct {
@@ -13,11 +13,11 @@ func NewHostFile(hostPath string) hostFile {
 }
 
 func (h *hostFile) Read() ([]byte, error) {
-	return ioutil.ReadFile(h.hostPath)
+	return os.ReadFile(h.hostPath)
 }
 
 func (h *hostFile) Write(data []byte) error {
-	return ioutil.WriteFile(h.hostPath, data, 0644)
+	return os.WriteFile(h.hostPath, data, 0644)
 }
 
 type Cmd struct {

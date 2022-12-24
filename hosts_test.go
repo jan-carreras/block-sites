@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -31,15 +31,15 @@ func TestApp_Handle(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			file, err := ioutil.TempFile("/tmp", "hoststest")
+			file, err := os.CreateTemp("/tmp", "hoststest")
 			require.NoError(t, err)
 			defer os.Remove(file.Name())
 
-			status, err := ioutil.TempFile("/tmp", "status")
+			status, err := os.CreateTemp("/tmp", "status")
 			require.NoError(t, err)
 			defer os.Remove(status.Name())
 
-			err = ioutil.WriteFile(file.Name(), []byte(test.having), 0666)
+			err = os.WriteFile(file.Name(), []byte(test.having), 0666)
 			require.NoError(t, err)
 
 			app := NewApp(
@@ -50,7 +50,7 @@ func TestApp_Handle(t *testing.T) {
 			err = app.Handle(test.havingCmd)
 			require.NoError(t, err)
 
-			data, err := ioutil.ReadFile(file.Name())
+			data, err := os.ReadFile(file.Name())
 			require.NoError(t, err)
 			assert.Equal(t, test.expects, string(data))
 		})
@@ -61,7 +61,7 @@ func testdata(t *testing.T, name string) string {
 	f, err := os.Open(filepath.Join("testdata", name))
 	require.NoError(t, err)
 
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	require.NoError(t, err)
 
 	return string(content)

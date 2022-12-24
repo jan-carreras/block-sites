@@ -10,6 +10,9 @@ test: ## Pass all the tests
 fmt:
 	go fmt ./...
 
+lint:
+	golangci-lint run
+
 build: test ## Build the binary
 	go build -o bin/hosts
 

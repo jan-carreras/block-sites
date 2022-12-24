@@ -2,15 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
 	"os"
 	"time"
 )
 
 const (
 	StatusRunning byte = 1
-	StatusPaused       = 2
+	StatusPaused  byte = 2
 )
 
 type appStatus struct {
@@ -19,7 +17,6 @@ type appStatus struct {
 
 type FileStatusManager struct {
 	path string
-	f    io.ReadWriter
 }
 
 func NewFileStatusManager(path string) AppStatusManager {
@@ -54,7 +51,7 @@ func (f *FileStatusManager) read() (appStatus, error) {
 		return appStatus{}, nil
 	}
 
-	payload, err := ioutil.ReadFile(f.path)
+	payload, err := os.ReadFile(f.path)
 	if err != nil {
 		return appStatus{}, err
 	}
@@ -77,7 +74,7 @@ func (f *FileStatusManager) Pause(duration time.Duration) error {
 		return err
 	}
 
-	return ioutil.WriteFile(f.path, payload, 0644)
+	return os.WriteFile(f.path, payload, 0644)
 }
 
 func (f *FileStatusManager) Resume() error {
@@ -93,5 +90,5 @@ func (f *FileStatusManager) Resume() error {
 		return err
 	}
 
-	return ioutil.WriteFile(f.path, payload, 0644)
+	return os.WriteFile(f.path, payload, 0644)
 }
