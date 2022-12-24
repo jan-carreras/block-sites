@@ -11,7 +11,7 @@ import (
 
 func main() {
 	app := NewApp(
-		"/etc/hosts",
+		NewHosts("/etc/hosts"),
 		NewStorage("/tmp/hostsstatus"),
 	)
 
@@ -21,8 +21,9 @@ func main() {
 }
 
 func getCmd() (cmd Cmd) {
-	flag.BoolVar(&cmd.Pause, "pause", false, "pause the execution for 1 hour")
-	flag.BoolVar(&cmd.Resume, "resume", false, "resume the execution of the script")
+	flag.BoolVar(&cmd.Unblock, "unblock", false, "allow access to websites for a limited amount of time")
+	flag.BoolVar(&cmd.Block, "block", false, "block all sites")
+	flag.StringVar(&cmd.Website, "web", "", "website to ban from now on")
 	flag.Parse()
 
 	return cmd

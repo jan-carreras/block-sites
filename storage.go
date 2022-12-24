@@ -11,8 +11,13 @@ const (
 	StatusPaused  = "paused"
 )
 
+type Website struct {
+	URL string
+}
+
 type appStatus struct {
 	PauseUntil time.Time `json:"paused_until,omitempty"`
+	Websites   []Website `json:"websites"`
 }
 
 type Storage struct {
@@ -21,6 +26,15 @@ type Storage struct {
 
 func NewStorage(path string) *Storage {
 	return &Storage{path: path}
+}
+
+func (s *Storage) Websites() ([]Website, error) {
+	status, err := s.read()
+	if err != nil {
+		return nil, err
+	}
+
+	return status.Websites, nil
 }
 
 func (s *Storage) IsStatus(status string) (bool, error) {
@@ -70,6 +84,23 @@ func (s *Storage) write(status appStatus) error {
 	}
 
 	return os.WriteFile(s.path, payload, 0644)
+}
+
+func (s *Storage) BanWebsite(website string) error {
+	data, err := s.read()
+	if err != nil {
+		return err
+	}
+
+	for _, w := range data.Websites {
+		if w.URL == website {
+			return nil
+		}
+	}
+
+	data.Websites = append(data.Websites, Website{URL: website})
+
+	return s.write(data)
 }
 
 func (s *Storage) read() (appStatus, error) {

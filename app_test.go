@@ -18,13 +18,13 @@ func TestApp_Handle(t *testing.T) {
 	}{
 		{
 			name:      "Base Case",
-			havingCmd: Cmd{Resume: false},
+			havingCmd: Cmd{Block: false},
 			having:    testdata(t, "basecase.input.txt"),
 			expects:   testdata(t, "basecase.output.txt"),
 		},
 		{
 			name:      "Empty line should not be commented",
-			havingCmd: Cmd{Pause: false},
+			havingCmd: Cmd{Unblock: false},
 			having:    testdata(t, "emptyline.input.txt"),
 			expects:   testdata(t, "emptyline.output.txt"),
 		},
@@ -43,7 +43,7 @@ func TestApp_Handle(t *testing.T) {
 			require.NoError(t, err)
 
 			app := NewApp(
-				file.Name(),
+				NewHosts(file.Name()),
 				NewStorage(status.Name()),
 			)
 
