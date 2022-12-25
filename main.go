@@ -3,21 +3,30 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"path/filepath"
 )
 
-// Be able to --pause (for 1h) and --resume the script functions
-// In Paused state it will prevent the script from doing anything
-// "Resume" with return the script into Running state
-
 func main() {
-	app := NewApp(
-		NewHosts("/etc/hosts"),
-		NewStorage("/tmp/hostsstatus"),
-	)
-
-	if err := app.Handle(getCmd()); err != nil {
+	err := run()
+	if err != nil {
 		log.Fatalf("Error! %v\n", err)
 	}
+}
+
+func run() error {
+	storagePath, err := getStoragePath()
+	if err != nil {
+		return err
+	}
+
+	app := NewApp(NewHosts(getHostsFile()), NewStorage(storagePath))
+
+	if err := app.Handle(getCmd()); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getCmd() (cmd Cmd) {
@@ -27,4 +36,29 @@ func getCmd() (cmd Cmd) {
 	flag.Parse()
 
 	return cmd
+}
+
+func getStoragePath() (string, error) {
+	path := os.Getenv("BLOCK_SITES_PATH")
+
+	if path != "" {
+		return path, nil
+	}
+
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	path = filepath.Join(dirname, "/.blocksites")
+
+	return path, nil
+}
+
+func getHostsFile() string {
+	path := os.Getenv("BLOCK_SITES_HOSTS_FILE")
+	if path != "" {
+		return path
+	}
+
+	return "/etc/hosts"
 }
